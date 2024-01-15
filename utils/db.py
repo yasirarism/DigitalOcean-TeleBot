@@ -11,25 +11,24 @@ class AccountsDB:
         self.accounts = db.table('Accounts')
 
     def save(self, email: str, token: str, remarks: str = ''):
-        email = email.strip()
         token = token.strip()
-        date = datetime.today().strftime('%Y-%m-%d')
+        date = datetime.now().strftime('%Y-%m-%d')
 
         if self.accounts.get(where('token') == token):
             raise Exception('Token Exists')
-        else:
-            self.accounts.insert({
-                'email': email,
-                'token': token,
-                'remarks': remarks,
-                'date': date
-            })
+        email = email.strip()
+        self.accounts.insert({
+            'email': email,
+            'token': token,
+            'remarks': remarks,
+            'date': date
+        })
 
     def all(self):
         return self.accounts.all()
 
     def get(self, doc_id: int):
-        return self.accounts.get(doc_id=int(doc_id))
+        return self.accounts.get(doc_id=doc_id)
 
     def remove(self, doc_id: int):
-        self.accounts.remove(doc_ids=[int(doc_id)])
+        self.accounts.remove(doc_ids=[doc_id])

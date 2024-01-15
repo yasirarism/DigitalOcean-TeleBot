@@ -7,7 +7,7 @@ def password_generator():
     c = '1234567890'
 
     p = ''
-    for i in range(3):
+    for _ in range(3):
         p += choice(a)
         p += choice(b)
         p += choice(c)

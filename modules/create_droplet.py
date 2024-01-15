@@ -61,7 +61,7 @@ def select_region(call: CallbackQuery, data: dict):
         'account': account
     }
 
-    _t = t + f'Akun: <code>{account["email"]}</code>\n\n'
+    _t = f'{t}Akun: <code>{account["email"]}</code>\n\n'
 
     bot.edit_message_text(
         text=f'{_t}'
@@ -74,15 +74,14 @@ def select_region(call: CallbackQuery, data: dict):
     regions = digitalocean.Manager(token=account['token']).get_all_regions()
 
     markup = InlineKeyboardMarkup(row_width=2)
-    buttons = []
-    for region in regions:
-        if region.available:
-            buttons.append(
-                InlineKeyboardButton(
-                    text=localize_region(slug=region.slug),
-                    callback_data=f'create_droplet?nf=select_size&region={region.slug}'
-                )
-            )
+    buttons = [
+        InlineKeyboardButton(
+            text=localize_region(slug=region.slug),
+            callback_data=f'create_droplet?nf=select_size&region={region.slug}',
+        )
+        for region in regions
+        if region.available
+    ]
     markup.add(*buttons)
 
     bot.edit_message_text(
@@ -102,8 +101,7 @@ def select_size(call: CallbackQuery, data: dict):
         'region_slug': region_slug
     })
 
-    _t = t + f'Akun: <code>{user_dict[call.from_user.id]["account"]["email"]}</code>\n' \
-             f'Negara: <code>{region_slug}</code>\n\n'
+    _t = f'{t}Akun: <code>{user_dict[call.from_user.id]["account"]["email"]}</code>\nNegara: <code>{region_slug}</code>\n\n'
 
     bot.edit_message_text(
         text=f'{_t}'
@@ -116,15 +114,14 @@ def select_size(call: CallbackQuery, data: dict):
     sizes = digitalocean.Manager(token=user_dict[call.from_user.id]['account']['token']).get_all_sizes()
 
     markup = InlineKeyboardMarkup(row_width=2)
-    buttons = []
-    for size in sizes:
-        if region_slug in size.regions:
-            buttons.append(
-                InlineKeyboardButton(
-                    text=size.slug,
-                    callback_data=f'create_droplet?nf=select_image&size={size.slug}'
-                )
-            )
+    buttons = [
+        InlineKeyboardButton(
+            text=size.slug,
+            callback_data=f'create_droplet?nf=select_image&size={size.slug}',
+        )
+        for size in sizes
+        if region_slug in size.regions
+    ]
     markup.add(*buttons)
     markup.row(
         InlineKeyboardButton(
@@ -150,9 +147,7 @@ def select_image(d: Union[Message, CallbackQuery], data: dict):
         'size_slug': size_slug
     })
 
-    _t = t + f'Akun: <code>{user_dict[d.from_user.id]["account"]["email"]}</code>\n' \
-             f'Negara: <code>{user_dict[d.from_user.id]["region_slug"]}</code>\n' \
-             f'Model: <code>{size_slug}</code>\n\n'
+    _t = f'{t}Akun: <code>{user_dict[d.from_user.id]["account"]["email"]}</code>\nNegara: <code>{user_dict[d.from_user.id]["region_slug"]}</code>\nModel: <code>{size_slug}</code>\n\n'
 
     def get_image_markup():
         images = digitalocean.Manager(token=user_dict[d.from_user.id]['account']['token']).get_distro_images()
@@ -221,10 +216,7 @@ def get_name(call: CallbackQuery, data: dict):
         'image_slug': image_slug
     })
 
-    _t = t + f'Akun: <code>{user_dict[call.from_user.id]["account"]["email"]}</code>\n' \
-             f'Negara: <code>{user_dict[call.from_user.id]["region_slug"]}</code>\n' \
-             f'Model: <code>{user_dict[call.from_user.id]["size_slug"]}</code>\n' \
-             f'Sys Os: <code>{image_slug}</code>\n\n'
+    _t = f'{t}Akun: <code>{user_dict[call.from_user.id]["account"]["email"]}</code>\nNegara: <code>{user_dict[call.from_user.id]["region_slug"]}</code>\nModel: <code>{user_dict[call.from_user.id]["size_slug"]}</code>\nSys Os: <code>{image_slug}</code>\n\n'
 
     msg = bot.edit_message_text(
         text=f'{_t}'
@@ -242,11 +234,7 @@ def ask_create(m: Message):
         select_image(m, data={'size': [user_dict[m.from_user.id]["size_slug"]]})
         return
 
-    _t = t + f'Akun: <code>{user_dict[m.from_user.id]["account"]["email"]}</code>\n' \
-             f'Negara: <code>{user_dict[m.from_user.id]["region_slug"]}</code>\n' \
-             f'Model: <code>{user_dict[m.from_user.id]["size_slug"]}</code>\n' \
-             f'Sys Os: <code>{user_dict[m.from_user.id]["image_slug"]}</code>\n' \
-             f'Nama: <code>{m.text}</code>\n\n'
+    _t = f'{t}Akun: <code>{user_dict[m.from_user.id]["account"]["email"]}</code>\nNegara: <code>{user_dict[m.from_user.id]["region_slug"]}</code>\nModel: <code>{user_dict[m.from_user.id]["size_slug"]}</code>\nSys Os: <code>{user_dict[m.from_user.id]["image_slug"]}</code>\nNama: <code>{m.text}</code>\n\n'
     markup = InlineKeyboardMarkup(row_width=2)
     markup.add(
         InlineKeyboardButton(

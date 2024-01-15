@@ -8,8 +8,6 @@ def localize_region(slug: str):
         {'slug': 'tor1', 'name': 'Toronto 1'},
     ]
 
-    for region in regions:
-        if region['slug'] == slug:
-            return region['name']
-
-    return slug
+    return next(
+        (region['name'] for region in regions if region['slug'] == slug), slug
+    )
